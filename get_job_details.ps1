@@ -1,4 +1,4 @@
-Get runtime date
+#Get runtime date
 $date = Get-Date -format yyyMMdd_HHmmss
 
 # Output File
@@ -16,6 +16,12 @@ foreach($Job in $Jobs) {
     $SessionStartTime = $session.CreationTime
     $SessionEndTime = $session.EndTime
 
+    # When a job was never started GetTaskSessions will throw an nul-valued
+    # expression error. Check if there is a valid session before execution
+    # otherwise continue to the next iteration
+    if (! $session){
+        continue
+    }
     $TaskSession = $session.GetTaskSessions()
     foreach($VM in $TaskSession){
         $JobName = $VM.JobName
