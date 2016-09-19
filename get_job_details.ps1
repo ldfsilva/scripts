@@ -5,7 +5,7 @@ $date = Get-Date -format yyyMMdd_HHmmss
 $file_name = 'veeam_job_details_' + $date + '.txt'
 
 # Create initial output file with header
-"VM Name,Job Name,Job Type,Job Start Time,Job End Time,Job Status,Job Progress,Total Size,Total Used Size,Processed Size,Processed Delta,Transferred Size,Disk Number,Start Time,End Time,Duration,Avg Speed,Data Store Name,Data Store Reference">> $file_name
+"VM Name,Job Name,Job Type,Job Start Time,Job State,Job Progress,Job End Time,Job Result,Total Size,Total Used Size,Processed Size,Processed Delta,Transferred Size,Disk Number,Start Time,End Time,Duration,Avg Speed,Data Store Name,Data Store Reference">> $file_name
 
 #
 $Jobs = Get-VBRJob
@@ -14,7 +14,11 @@ foreach($Job in $Jobs) {
 
     #Overall job timing
     $SessionStartTime = $session.CreationTime
+    $State = $session.State
+    $Progress = $session.BaseProgress
     $SessionEndTime = $session.EndTime
+    $Result = $session.Result
+    $Type = $Job.jobtype
 
     # When a job was never started GetTaskSessions will throw an nul-valued
     # expression error. Check if there is a valid session before execution
@@ -26,10 +30,8 @@ foreach($Job in $Jobs) {
     foreach($VM in $TaskSession){
         $JobName = $VM.JobName
         $VMName = $VM.Name
-        $Type = $Job.jobtype
-        $Status = $VM.status
+        $Status = $VM.status #Verify if it's useful to keep track of VM status or not
 
-        $Progress = $VM.Progress.Percents
         $ProcessedSize = $VM.Progress.ProcessedSize
 
         #VM Capacity Details
@@ -51,7 +53,7 @@ foreach($Job in $Jobs) {
     }
 
     # Write output to file
-    $VMName + "," + $JobName + "," + $Type + "," + $SessionStartTime + "," + $SessionEndTime + "," + $Status + "," + $Progress + "," + $TotalSize + "," + $TotalUsedSize + "," + $ProcessedSize + "," + $ProcessedDelta + "," + $TransferedSize + "," + $DiskNum + "," + $Start + "," + $Finish + "," + $Duration + "," + $AvgSpeed + "," + $DatastoreName + "," + $DatastoreReference >> $file_name
+    $VMName + "," + $JobName + "," + $Type + "," + $SessionStartTime + "," + $State + "," + $Progress + "," + $SessionEndTime + "," + $Result + "," + $TotalSize + "," + $TotalUsedSize + "," + $ProcessedSize + "," + $ProcessedDelta + "," + $TransferedSize + "," + $DiskNum + "," + $Start + "," + $Finish + "," + $Duration + "," + $AvgSpeed + "," + $DatastoreName + "," + $DatastoreReference >> $file_name
 }
 
 #Check object properties
