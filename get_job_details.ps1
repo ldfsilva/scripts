@@ -29,7 +29,7 @@ foreach($Job in $Jobs) {
         $Type = $Job.jobtype
         $Status = $VM.status
 
-        $Progress = $VM.Progress.DisplayName
+        $Progress = $VM.Progress.Percents
         $ProcessedSize = $VM.Progress.ProcessedSize
 
         #VM Capacity Details
