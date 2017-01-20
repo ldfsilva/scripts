@@ -43,10 +43,9 @@ function reset_all_jobs($job_list){
 }
 
 # Given an array containing job names, it will iterate through and shedule all of them
-# according to the specified offset.
-function schedule_jobs($job_list){
+# according to the specified offset. If no offset is specified default will be 2
+function schedule_jobs($job_list, $off_set=2){
     $cnt = 0
-    $off_set = 2
     $index = 0
     foreach ( $job_name in $job_list ){
 		echo "---"
