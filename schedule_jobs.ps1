@@ -49,12 +49,11 @@ function schedule_jobs($job_list){
     $off_set = 2
     $index = 0
     foreach ( $job_name in $job_list ){
+		echo "---"
         $job = Get-VBRJob -Name $job_name
         echo "cnt: $cnt - off_set: $off_set - index: $index - jobname: $job_name"
-        echo ""
         if ($job){
             if ($cnt -lt $off_set){
-                echo "ENTROU"
                 $cnt = $cnt + 1
                 reset_job($job_name)
                 disable_job($job_name)
@@ -63,7 +62,7 @@ function schedule_jobs($job_list){
             $index = $cnt - $off_set
             $after_job = $job_list[$index]
             Set-VBRJobSchedule -Job $job -After -AfterJob $after_job
-            Enable-VBRJobSchedule -Job $job
+            enable_job($job_name)
         }else {
             echo "Unable to find $job_name"
         }
