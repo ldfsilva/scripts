@@ -8,7 +8,7 @@ function get_job_details(){
     $file_name = 'veeam_job_details_' + $date + '.txt'
 
     # Create initial output file with header
-    "VM Name,Job Name,Job Type,Job Start Time,Job State,Job Progress,Job End Time,Job Result,Total Size,Total Used Size,Processed Size,Processed Delta,Transferred Size,Disk Number,Start Time,End Time,Duration,Avg Speed,Data Store Name,Data Store Reference">> $file_name
+    "VM Name,Job Name,Job Type,Job Start Time,Job State,Job Progress,Job End Time,Job Duration (D:H:M:S),Job Result,Total Size (bytes),Total Used Size (bytes),Processed Size (bytes),Processed Delta (bytes),Transferred Size (bytes),VM Start Time,VM End Time,VM Duration (D:H:M:S),VM Duration (Secods),Avg Speed (bytes),Data Store Name,Data Store Reference">> $file_name
 
     #
     $Jobs = Get-VBRJob
@@ -20,6 +20,9 @@ function get_job_details(){
         $State = $session.State
         $Progress = $session.BaseProgress
         $SessionEndTime = $session.EndTime
+        $Duration = $session.progress.Duration
+        $Duration_str = ("{0}:{1}:{2}:{3}" -f `
+            $Duration.Days, $Duration.Hours, $Duration.Minutes, $Duration.Seconds)
         $Result = $session.Result
         $Type = $Job.jobtype
 
@@ -38,7 +41,6 @@ function get_job_details(){
             $ProcessedSize = $VM.Progress.ProcessedSize
 
             #VM Capacity Details
-            $DiskNum = $VM.CurrentDiskNum
             $TotalSize = $VM.progress.TotalSize
             $TotalUsedSize = $VM.progress.TotalUsedSize
             $TransferedSize = $VM.progress.TransferedSize
@@ -46,9 +48,11 @@ function get_job_details(){
 
             $Start = $VM.progress.starttime
             $Finish = $VM.progress.stoptime
-            $Duration = $VM.progress.Duration
+            $VM_Duration = $VM.progress.Duration
+            $TotalSeconds = $Duration.TotalSeconds
+            $VM_Duration_str = ("{0}:{1}:{2}:{3}" -f `
+                $VM_Duration.Days, $VM_Duration.Hours, $VM_Duration.Minutes, $VM_Duration.Seconds)
             $AvgSpeed = $VM.progress.AvgSpeed
-
             $schedule = $job.GetScheduleOptions()
 
             $DatastoreName = $Job.ViReplicaTargetOptions.DatastoreName
@@ -56,7 +60,7 @@ function get_job_details(){
         }
 
         # Write output to file
-        $VMName + "," + $JobName + "," + $Type + "," + $SessionStartTime + "," + $State + "," + $Progress + "," + $SessionEndTime + "," + $Result + "," + $TotalSize + "," + $TotalUsedSize + "," + $ProcessedSize + "," + $ProcessedDelta + "," + $TransferedSize + "," + $DiskNum + "," + $Start + "," + $Finish + "," + $Duration + "," + $AvgSpeed + "," + $DatastoreName + "," + $DatastoreReference >> $file_name
+        $VMName + "," + $JobName + "," + $Type + "," + $SessionStartTime + "," + $State + "," + $Progress + "," + $SessionEndTime + "," + $Duration_str + "," + $Result + "," + $TotalSize + "," + $TotalUsedSize + "," + $ProcessedSize + "," + $ProcessedDelta + "," + $TransferedSize + "," + $Start + "," + $Finish + "," + $VM_Duration_str + "," + $TotalSeconds + "," + $AvgSpeed + "," + $DatastoreName + "," + $DatastoreReference >> $file_name
     }
 
     #Check object properties
