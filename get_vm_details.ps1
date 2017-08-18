@@ -21,30 +21,30 @@ function get_vm_details($vm_list){
 
     # Create Replication Job
     foreach ( $vm in $vm_list ){
-        $vm_detail = Find-VBRViEntity -Name $vm
+        $vms_detail = Find-VBRViEntity -Name $vm
 
-        $name = $vm_detail.name
-        if (-Not $vm_detail){
+        if (-Not $vms_detail){
             $status = "VM Not Found"
-            $name = $vm
 
             # Write output to file
-            $name + "," + $status >> $file_name
+            $vm + "," + $status >> $file_name
         }else {
-            $status = 'VM Found'
-            $path = $vm_detail.path
-            $hostname = $vm_detail.vmhostname
-            $uuid = $vm_detail.uuid
-            $state = $vm_detail.powerstate
-            $provisioned_size = $vm_detail.provisionedsize
-            $used_size = $vm_detail.usedsize
-            $provisioned_size_gb = $provisioned_size/1024/1024/1024
-            $provisioned_size_gb = "{0:N2}" -f $provisioned_size_gb -replace ",", ""
-            $used_size_gb = $used_size/1024/1024/1024
-            $used_size_gb = "{0:N2}" -f $used_size_gb -replace ",", ""
+            foreach ( $vm_detail in $vms_detail ) {
+                $status = 'VM Found'
+                $path = $vm_detail.path
+                $hostname = $vm_detail.vmhostname
+                $uuid = $vm_detail.uuid
+                $state = $vm_detail.powerstate
+                $provisioned_size = $vm_detail.provisionedsize
+                $used_size = $vm_detail.usedsize
+                $provisioned_size_gb = $provisioned_size/1024/1024/1024
+                $provisioned_size_gb = "{0:N2}" -f $provisioned_size_gb -replace ",", ""
+                $used_size_gb = $used_size/1024/1024/1024
+                $used_size_gb = "{0:N2}" -f $used_size_gb -replace ",", ""
 
-            # Write output to file
-            $name + "," + $status + "," + $state + "," + $uuid + "," + $hostname + "," + $path + "," + $provisioned_size + "," + $used_size + "," + $provisioned_size_gb + "," + $used_size_gb + "," + $file_name >> $file_name
+                # Write output to file
+                $vm + "," + $status + "," + $state + "," + $uuid + "," + $hostname + "," + $path + "," + $provisioned_size + "," + $used_size + "," + $provisioned_size_gb + "," + $used_size_gb + "," + $file_name >> $file_name
+            }
         }
     }
 }
